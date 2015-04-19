@@ -141,7 +141,7 @@ function! s:init()
     let indent = i * &tabstop
     let allbut = i == 1 ? 'ALL' : 'ALLBUT,'.join(map(range(1, i), '"indent".v:val'), ',')
     execute printf('syn region indent%d start=/^\s\{%d,}[-@#$*:xo0-9+>=][.:)]\?\s/ end=/$/ contains=%s', i, indent, allbut)
-    execute printf('syn region indent%d start=/^\s\{%d,}  [^-@#$*:xo0-9+>=]/ end=/$/ contains=%s', i, indent, allbut)
+    execute printf('syn region indent%d start=/^\s\{%d,}  \([-@#$*:xo0-9+>=]\s\)\@<!/ end=/$/ contains=%s', i, indent, allbut)
     execute printf('syn match indentBullet%d  /^\s\{%d,}[-@#$*:xo0-9+>=][.:)]\?\s/ containedin=indent%d contained', i, indent, i)
     execute printf('syn match indentValue /\S:\s\+\zs.\{}/ containedin=indent%d contained', i)
     execute printf('hi indent%d %sfg=%s', i, has('gui') ? 'gui' : 'cterm', colors[i % len(colors)])
