@@ -78,6 +78,11 @@ syn keyword weekend SAT SUN sat sun
 hi def link weekday WarningMsg
 hi def link weekend MoreMsg
 
+syn keyword month JAN FEB MAR APR MAY JUN JUL AUG SEP OCT NOV DEC
+syn keyword month Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
+syn keyword month jan feb mar apr may jun jul aug sep oct nov dec
+hi def link month Constant
+
 syn region blockComment start="/\*" end="\*/"
 hi def link blockComment Comment
 
