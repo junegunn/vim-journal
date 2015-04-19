@@ -89,6 +89,10 @@ hi def link blockComment Comment
 syn region codeSpan start="`" end="`"
 hi def link codeSpan String
 
+syn region strong oneline matchgroup=strongSign start="\*\ze\S" end="\S\zs\*"
+hi def link strong Question
+hi def link strongSign Exception
+
 syn match reference /\[[0-9]\+\]/
 hi def link reference Keyword
 
