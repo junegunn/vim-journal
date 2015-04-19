@@ -64,7 +64,7 @@ endfunction
 syn match indentBullet0 /^[-@#$*:xo0-9+>=][.:)]\?\s/
 hi def link indentBullet0 Label
 
-syn region topLevel start="^[0-9].*" end="$" contains=ALL
+syn region topLevel start="^[0-9A-Z].*" end="$" contains=ALL
 hi def link topLevel Directory
 
 syn match url %https\?://\(\w\+\(:\w\+\)\?@\)\?[A-Za-z0-9-_.]*\(:[0-9]\{1,5}\)\?\S*%
