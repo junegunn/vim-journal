@@ -73,8 +73,8 @@ hi def link url Underlined
 syn keyword bool true false
 hi def link bool Boolean
 
-syn keyword weekday MON TUE WED THU FRI mon tue wed thu fri
-syn keyword weekend SAT SUN sat sun
+syn keyword weekday MON TUE WED THU FRI Mon Tue Wed Thu Fri mon tue wed thu fri
+syn keyword weekend SAT SUN Sat Sun sat sun
 hi def link weekday WarningMsg
 hi def link weekend MoreMsg
 
