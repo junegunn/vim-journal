@@ -70,7 +70,7 @@ function! s:extract_colors()
     endif
 
     let [h, s, l] = s:rgbhsl(fg)
-    if !has_key(blacklist, fg) && abs(l - l0) < 0.4 && s < 0.6
+    if !has_key(blacklist, fg) && abs(l - l0) < 0.3 && s < 0.6
       let colors[fg] = 1
     endif
   endfor
