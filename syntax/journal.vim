@@ -25,6 +25,9 @@ if exists("b:current_syntax")
   finish
 endif
 
+let s:max_indent = get(g:, 'journal#max_indent', 10)
+let s:color_index = get(g:, 'journal#color_index', 0)
+
 syn clear
 
 function! s:blacklist()
@@ -42,8 +45,16 @@ function! s:extract_fg(line)
   return matchstr(a:line, (has('gui') ? 'gui' : 'cterm').'fg=\zs\S*\ze')
 endfunction
 
+function! s:compare_h(c1, c2)
+  let h1 = s:rgbhsl(a:c1)[0]
+  let h2 = s:rgbhsl(a:c2)[0]
+  return h1 == h2 ? 0 : h1 > h2 ? 1 : -1
+endfunction
+
 function! s:extract_colors()
   let blacklist = s:blacklist()
+  let defnormal = &background == 'dark' ? 253 : 233
+  let [h0, s0, l0] = s:rgbhsl(empty(blacklist) ? defnormal : keys(blacklist)[0])
   for c in get(g:, 'journal#blacklist', [])
     let blacklist[c] = 1
   endfor
@@ -53,12 +64,94 @@ function! s:extract_colors()
   redir END
   let colors = {}
   for line in filter(split(output, '\n'), 'v:val =~# "fg" && v:val !~# "bg"')
-    let fg =s:extract_fg(line)
-    if !empty(fg) && !has_key(blacklist, fg)
+    let fg = s:extract_fg(line)
+    if empty(fg)
+      continue
+    endif
+
+    let [h, s, l] = s:rgbhsl(fg)
+    if !has_key(blacklist, fg) && abs(l - l0) < 0.4 && s < 0.6
       let colors[fg] = 1
     endif
   endfor
-  return keys(colors)
+  let list = keys(colors)
+  if len(colors) > s:max_indent
+    let trimmed = []
+    let ratio = 1.0 * len(list) / s:max_indent
+    let idx = 0.0
+    while len(trimmed) < s:max_indent
+      call add(trimmed, list[float2nr(idx)])
+      let idx += ratio
+    endwhile
+    let list = trimmed
+  endif
+
+  return sort(list, function('s:compare_h'))
+endfunction
+
+" http://stackoverflow.com/questions/27159322/rgb-values-of-the-colors-in-the-ansi-extended-colors-index-17-255
+let s:ansi16 = {
+  \ 0:  '#000000', 1:  '#800000', 2:  '#008000', 3:  '#808000',
+  \ 4:  '#000080', 5:  '#800080', 6:  '#008080', 7:  '#c0c0c0',
+  \ 8:  '#808080', 9:  '#ff0000', 10: '#00ff00', 11: '#ffff00',
+  \ 12: '#0000ff', 13: '#ff00ff', 14: '#00ffff', 15: '#ffffff' }
+function! s:rgb(color)
+  if a:color[0] == '#'
+    let r = str2nr(a:color[1:2], 16)
+    let g = str2nr(a:color[3:4], 16)
+    let b = str2nr(a:color[5:6], 16)
+    return [r, g, b]
+  endif
+
+  let ansi = str2nr(a:color)
+
+  if ansi < 16
+    return s:rgb(s:ansi16[ansi])
+  endif
+
+  if ansi >= 232
+    let v = (ansi - 232) * 10 + 8
+    return [v, v, v]
+  endif
+
+  let r = (ansi - 16) / 36
+  let g = ((ansi - 16) % 36) / 6
+  let b = (ansi - 16) % 6
+
+  return map([r, g, b], 'v:val > 0 ? (55 + v:val * 40) : 0')
+endfunction
+
+" http://stackoverflow.com/questions/2353211/hsl-to-rgb-color-conversion
+function! s:hsl(rgb)
+  let [max, min] = map([max(a:rgb), min(a:rgb)], 'v:val / 255.0')
+  let [r, g, b]  = map(a:rgb, 'v:val / 255.0')
+  let h = (max + min) / 2.0
+  let s = h
+  let l = h
+
+  if max == min
+    return [0, 0, h]
+  endif
+
+  let d = max - min
+  let s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
+
+  if     max == r | let h = (g - b) / d + (g < b ? 6 : 0)
+  elseif max == g | let h = (b - r) / d + 2
+  elseif max == b | let h = (r - g) / d + 4
+  endif
+  let h = h / 6.0
+  return [h, s, l]
+endfunction
+
+let s:rgbhsl = {}
+function! s:rgbhsl(color)
+  if has_key(s:rgbhsl, a:color)
+    return s:rgbhsl[a:color]
+  endif
+  let hsl = s:hsl(s:rgb(a:color))
+  let s:rgbhsl[a:color] = hsl
+  return hsl
 endfunction
 
 syn match indentBullet0 /^[-@#$*:xo0-9+>=][.:)]\?\s/
@@ -137,15 +230,20 @@ endfunction
 
 function! s:init()
   let colors = s:extract_colors()
-  for i in range(1, 10)
+  for i in range(1, s:max_indent)
     let indent = i * &tabstop
     let allbut = i == 1 ? 'ALL' : 'ALLBUT,'.join(map(range(1, i), '"indent".v:val'), ',')
     execute printf('syn region indent%d start=/^\s\{%d,}[-@#$*:xo0-9+>=][.:)]\?\s/ end=/$/ contains=%s', i, indent, allbut)
     execute printf('syn region indent%d start=/^\s\{%d,}  \([-@#$*:xo0-9+>=]\s\)\@<!/ end=/$/ contains=%s', i, indent, allbut)
     execute printf('syn match indentBullet%d  /^\s\{%d,}[-@#$*:xo0-9+>=][.:)]\?\s/ containedin=indent%d contained', i, indent, i)
     execute printf('syn match indentValue /\S:\s\+\zs.\{}/ containedin=indent%d contained', i)
-    execute printf('hi indent%d %sfg=%s', i, has('gui') ? 'gui' : 'cterm', colors[i % len(colors)])
-    execute printf('hi indentBullet%d %sfg=%s', i, has('gui') ? 'gui' : 'cterm', colors[(i + 3) % len(colors)])
+    if !empty(colors)
+      let cidx = i - 1 + s:color_index
+      let col  = colors[cidx % len(colors)]
+      let bcol = colors[(cidx + s:max_indent / 2) % len(colors)]
+      execute printf('hi indent%d %sfg=%s',       i, has('gui') ? 'gui' : 'cterm', col)
+      execute printf('hi indentBullet%d %sfg=%s', i, has('gui') ? 'gui' : 'cterm', bcol)
+    endif
     execute printf('hi def link indentValue%d Normal', i)
   endfor
 
