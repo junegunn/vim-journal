@@ -188,6 +188,10 @@ syn region strong oneline matchgroup=strongSign start="\*\ze\S" end="\S\zs\*"
 hi def link strong Question
 hi def link strongSign Exception
 
+syn region strikeThrough oneline matchgroup=strikeThroughSign start="\~\ze\S" end="\S\zs\~"
+hi def link strikeThrough Ignore
+hi def link strikeThroughSign NonText
+
 syn match reference /\[[0-9]\+\]/
 hi def link reference Keyword
 
