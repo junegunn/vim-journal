@@ -180,7 +180,7 @@ syn keyword month Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
 syn keyword month jan feb mar apr may jun jul aug sep oct nov dec
 hi def link month Constant
 
-syn region blockComment start="/\*" end="\*/"
+syn region blockComment start="\</\*" end="\*/"
 hi def link blockComment Comment
 
 syn region codeSpan start="`" end="`"
