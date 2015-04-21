@@ -156,7 +156,9 @@ function! s:rgbhsl(color)
   return hsl
 endfunction
 
-syn match indentBullet0 /^[-@#$*:xo0-9+>=][.:)]\?\s/
+let s:bullets = '[-@#$*:xo0-9+>=][.:)]\?\s'
+execute 'syn region indent0 start=/^'.s:bullets.'/ end=/^\ze\S/ contains=ALL fold'
+execute 'syn match indentBullet0 /^'.s:bullets.'/ containedin=indent0 contained'
 hi def link indentBullet0 Label
 
 syn region topLevel start="^[0-9A-Z].*" end="$" contains=ALL
@@ -240,10 +242,10 @@ function! s:init()
   let shift = get(g:, 'journal#color_shift', max_indent / 2)
   for i in range(1, max_indent)
     let indent = i * &tabstop
-    let allbut = i == 1 ? 'ALL' : 'ALLBUT,'.join(map(range(1, i), '"indent".v:val'), ',')
-    execute printf('syn region indent%d start=/^\s\{%d,}[-@#$*:xo0-9+>=][.:)]\?\s/ end=/$/ contains=%s', i, indent, allbut)
-    execute printf('syn region indent%d start=/^\s\{%d,}  \([-@#$*:xo0-9+>=]\s\)\@<!/ end=/$/ contains=%s', i, indent, allbut)
-    execute printf('syn match indentBullet%d  /^\s\{%d,}[-@#$*:xo0-9+>=][.:)]\?\s/ containedin=indent%d contained', i, indent, i)
+    let allbut = 'ALLBUT,'.join(map(range(1, i), '"indent".v:val'), ',')
+    execute printf('syn region indent%d start=/^\s\{%d}%s/           end=/^\(\s\{,%d}\S\)\@=/ contains=%s fold', i, indent, s:bullets, indent, allbut)
+    execute printf('syn region indent%d start=/^\s\{%d}  \(%s\)\@<!/ end=/^\(\s\{,%d}\S\)\@=/ contains=%s fold', i, indent, s:bullets, indent, allbut)
+    execute printf('syn match  indentBullet%d /^\s\{%d,}\zs%s/ containedin=indent%d contained', i, indent, s:bullets, i)
     execute printf('syn match indentValue /\S:\s\+\zs.\{}/ containedin=indent%d contained', i)
     if !empty(colors)
       let cidx = i - 1 + shift
