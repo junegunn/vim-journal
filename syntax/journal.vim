@@ -25,9 +25,6 @@ if exists("b:current_syntax")
   finish
 endif
 
-let s:max_indent = get(g:, 'journal#max_indent', 10)
-let s:color_index = get(g:, 'journal#color_index', 0)
-
 syn clear
 
 function! s:blacklist()
@@ -46,15 +43,19 @@ function! s:extract_fg(line)
 endfunction
 
 function! s:compare_h(c1, c2)
-  let h1 = s:rgbhsl(a:c1)[0]
-  let h2 = s:rgbhsl(a:c2)[0]
+  let h1 = s:rgbhsl(a:c1).h
+  let h2 = s:rgbhsl(a:c2).h
   return h1 == h2 ? 0 : h1 > h2 ? 1 : -1
 endfunction
 
-function! s:extract_colors()
+function! s:default_color_filter(hsl, normhsl)
+  return abs(a:hsl.l - a:normhsl.l) < 0.3 && a:hsl.s < 0.4
+endfunction
+
+function! s:extract_colors(max_count)
   let blacklist = s:blacklist()
   let defnormal = &background == 'dark' ? 253 : 233
-  let [h0, s0, l0] = s:rgbhsl(empty(blacklist) ? defnormal : keys(blacklist)[0])
+  let normhsl = s:rgbhsl(empty(blacklist) ? defnormal : keys(blacklist)[0])
   for c in get(g:, 'journal#blacklist', [])
     let blacklist[c] = 1
   endfor
@@ -69,17 +70,18 @@ function! s:extract_colors()
       continue
     endif
 
-    let [h, s, l] = s:rgbhsl(fg)
-    if !has_key(blacklist, fg) && abs(l - l0) < 0.3 && s < 0.6
+    let hsl = s:rgbhsl(fg)
+    let fns = copy(get(g:, 'journal#color_filters', [function('<sid>default_color_filter')]))
+    if !has_key(blacklist, fg) && min(map(fns, 'v:val(hsl, normhsl)')) == 1
       let colors[fg] = 1
     endif
   endfor
   let list = keys(colors)
-  if len(colors) > s:max_indent
+  if len(colors) > a:max_count
     let trimmed = []
-    let ratio = 1.0 * len(list) / s:max_indent
+    let ratio = 1.0 * len(list) / a:max_count
     let idx = 0.0
-    while len(trimmed) < s:max_indent
+    while len(trimmed) < a:max_count
       call add(trimmed, list[float2nr(idx)])
       let idx += ratio
     endwhile
@@ -130,7 +132,7 @@ function! s:hsl(rgb)
   let l = h
 
   if max == min
-    return [0, 0, h]
+    return {'h': 0, 's': 0, 'l': h}
   endif
 
   let d = max - min
@@ -141,7 +143,7 @@ function! s:hsl(rgb)
   elseif max == b | let h = (r - g) / d + 4
   endif
   let h = h / 6.0
-  return [h, s, l]
+  return {'h': h, 's': s, 'l': l}
 endfunction
 
 let s:rgbhsl = {}
@@ -229,8 +231,10 @@ function! s:syntax_include(lang, b, e, inclusive)
 endfunction
 
 function! s:init()
-  let colors = s:extract_colors()
-  for i in range(1, s:max_indent)
+  let max_indent = get(g:, 'journal#max_indent', 10)
+  let colors = s:extract_colors(max_indent)
+  let shift = get(g:, 'journal#color_shift', max_indent / 2)
+  for i in range(1, max_indent)
     let indent = i * &tabstop
     let allbut = i == 1 ? 'ALL' : 'ALLBUT,'.join(map(range(1, i), '"indent".v:val'), ',')
     execute printf('syn region indent%d start=/^\s\{%d,}[-@#$*:xo0-9+>=][.:)]\?\s/ end=/$/ contains=%s', i, indent, allbut)
@@ -238,9 +242,9 @@ function! s:init()
     execute printf('syn match indentBullet%d  /^\s\{%d,}[-@#$*:xo0-9+>=][.:)]\?\s/ containedin=indent%d contained', i, indent, i)
     execute printf('syn match indentValue /\S:\s\+\zs.\{}/ containedin=indent%d contained', i)
     if !empty(colors)
-      let cidx = i - 1 + s:color_index
+      let cidx = i - 1 + shift
       let col  = colors[cidx % len(colors)]
-      let bcol = colors[(cidx + s:max_indent / 2) % len(colors)]
+      let bcol = colors[(cidx + max_indent / 2) % len(colors)]
       execute printf('hi indent%d %sfg=%s',       i, has('gui') ? 'gui' : 'cterm', col)
       execute printf('hi indentBullet%d %sfg=%s', i, has('gui') ? 'gui' : 'cterm', bcol)
     endif
