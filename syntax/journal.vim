@@ -170,14 +170,13 @@ hi def link url Underlined
 syn keyword bool true false
 hi def link bool Boolean
 
-syn keyword weekday MON TUE WED THU FRI Mon Tue Wed Thu Fri mon tue wed thu fri
-syn keyword weekend SAT SUN Sat Sun sat sun
+syn keyword weekday MON TUE WED THU FRI Mon Tue Wed Thu Fri
+syn keyword weekend SAT SUN Sat Sun
 hi def link weekday WarningMsg
 hi def link weekend MoreMsg
 
 syn keyword month JAN FEB MAR APR MAY JUN JUL AUG SEP OCT NOV DEC
 syn keyword month Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
-syn keyword month jan feb mar apr may jun jul aug sep oct nov dec
 hi def link month Constant
 
 syn region blockComment start="\</\*" end="\*/"
