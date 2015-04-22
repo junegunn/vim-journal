@@ -199,6 +199,9 @@ hi def link blockComment Comment
 syn region codeSpan oneline start="`" end="`"
 hi def link codeSpan String
 
+syn match file @\(^\|\s\zs\)[/~]\S\{-}\ze\(:\|\s\|$\)@
+hi def link file PreProc
+
 syn region strong oneline matchgroup=strongSign start="\*\ze\S" end="\S\zs\*"
 hi def link strong Question
 hi def link strongSign Exception
