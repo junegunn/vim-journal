@@ -188,6 +188,11 @@ hi def link logLevelWarn WarningMsg
 syn keyword logLevelError ERROR FATAL
 hi def link logLevelError Exception
 
+syn match date @\<[0-9]\{4}[-/][0-9]\{2}[-/][0-9]\{2}@
+hi def link date Directory
+syn match time @\<[0-9]\{2}:[0-9]\{2}:[0-9]\{2}\([,.][0-9]\+\)\?@
+hi def link time Number
+
 syn region blockComment start="\</\*" end="\*/"
 hi def link blockComment Comment
 
