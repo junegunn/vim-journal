@@ -199,6 +199,9 @@ hi def link blockComment Comment
 syn region codeSpan oneline start="`" end="`"
 hi def link codeSpan String
 
+syn region blockCode matchgroup=Snip start="```" end="```"
+hi def link blockCode String
+
 syn match file @\(^\|\s\zs\)[/~]\S\{-}\ze\(:\|\s\|$\)@
 hi def link file PreProc
 
