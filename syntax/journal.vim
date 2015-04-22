@@ -179,6 +179,15 @@ syn keyword month JAN FEB MAR APR MAY JUN JUL AUG SEP OCT NOV DEC
 syn keyword month Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
 hi def link month Constant
 
+syn keyword logLevelIgnore DEBUG TRACE
+hi def link logLevelOk Comment
+syn keyword logLevelInfo INFO
+hi def link logLevelInfo Conditional
+syn keyword logLevelWarn WARN
+hi def link logLevelWarn WarningMsg
+syn keyword logLevelError ERROR FATAL
+hi def link logLevelError Exception
+
 syn region blockComment start="\</\*" end="\*/"
 hi def link blockComment Comment
 
