@@ -210,7 +210,7 @@ syn region strikeThrough oneline matchgroup=strikeThroughSign start="\~\ze\S" en
 hi def link strikeThrough Ignore
 hi def link strikeThroughSign NonText
 
-syn match reference /\[[0-9]\+\]/
+syn match reference /\[[0-9]\{1,3}\]/
 hi def link reference Keyword
 
 syn match separator /^[-=]\+$/
