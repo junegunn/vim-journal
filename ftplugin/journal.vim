@@ -66,3 +66,28 @@ nnoremap <buffer> [] <nop>
 xnoremap <buffer> ][ <nop>
 xnoremap <buffer> [] <nop>
 
+function! s:bullet()
+  let line = getline('.')
+  let indent = matchstr(line, '^\s*')
+  let rest = line[len(indent):]
+  let bullet = matchstr(rest, '^'.journal#_bullets().'\+')
+  if empty(bullet)
+    return "\<cr>"
+  elseif bullet =~ '^[0-9]'
+    let match = matchlist(bullet, '^\([0-9]\+\)\(.\)')
+    let num   = str2nr(match[1])
+    let tail  = match[2]
+    return "\<cr>".(num + 1).tail." "
+  elseif bullet =~ '^\[.\]'
+    return "\<cr>".bullet
+  endif
+  let ret = "\<cr>"
+  for _ in range(len(bullet) / &shiftwidth)
+    let ret .= "\<bs>"
+  endfor
+  return ret.bullet
+endfunction
+
+inoremap <buffer> <expr> <esc><cr> <sid>bullet()
+nnoremap <buffer> <expr> <esc><cr> 'A'.<sid>bullet()
+
