@@ -196,7 +196,7 @@ hi def link time Number
 syn region blockComment start="\</\*" end="\*/"
 hi def link blockComment Comment
 
-syn region codeSpan start="`" end="`"
+syn region codeSpan oneline start="`" end="`"
 hi def link codeSpan String
 
 syn region strong oneline matchgroup=strongSign start="\*\ze\S" end="\S\zs\*"
