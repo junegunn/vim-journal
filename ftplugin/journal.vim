@@ -51,7 +51,7 @@ function! s:progress(fw)
       break
     endif
   endwhile
-  if i >= 0 && getline('.')[col('.') - 1:] =~ '^[-@#$*:xo0-9+>=][.:)]\?\s'
+  if i >= 0 && getline('.')[col('.') - 1:] =~ '^'.journal#_bullets()
     normal! w
   endif
 endfunction

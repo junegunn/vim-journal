@@ -156,10 +156,18 @@ function! s:rgbhsl(color)
   return hsl
 endfunction
 
-let s:bullets = '[-@#$*:xo0-9+>=][.:)]\?\s'
+let s:bullets = journal#_bullets()
 execute 'syn region indent0 start=/^'.s:bullets.'/ end=/^\ze\S/ contains=ALL fold'
-execute 'syn match indentBullet0 /^'.s:bullets.'/ containedin=indent0 contained'
+execute 'syn match  indentBullet0 /^'.s:bullets.'/ containedin=indent0 contained'
 hi def link indentBullet0 Label
+
+syn match checkboxChecked   /\[\zs[xov]\ze\]/
+syn match checkboxException /\[\zs[*!]\ze\]/
+syn match checkboxEtc       /\[\zs[+=-]\ze\]/
+syn cluster checkbox contains=checkboxChecked,checkboxException,checkboxEtc
+hi def link checkboxChecked   Boolean
+hi def link checkboxException Exception
+hi def link checkboxEtc       Conditional
 
 syn region topLevel start="^[0-9].*\|.*:$" end="$" contains=ALLBUT,topLevel
 hi def link topLevel Directory
@@ -219,9 +227,6 @@ hi def link reference Keyword
 syn match separator /^[-=]\+$/
 hi def link separator Structure
 
-syn match keyValue /^\s*\S\+[^:]*:\s\+[^:]\+$/ transparent contains=keyValueValue containedin=ALL
-syn match keyValueValue /:\s\+\zs.*$/ containedin=keyValue contained
-
 function! s:syntax_include(lang, b, e, inclusive)
   let syns = split(globpath(&rtp, "syntax/".a:lang.".vim"), "\n")
   if empty(syns)
@@ -264,10 +269,10 @@ function! s:init()
   let shift = get(g:, 'journal#color_shift', max_indent / 2)
   for i in range(1, max_indent)
     let indent = i * &tabstop
-    let allbut = 'ALLBUT,keyValueValue,'.join(map(range(1, i), '"indent".v:val'), ',')
+    let allbut = 'ALLBUT,topLevel,'.join(map(range(1, i), '"indent".v:val'), ',')
     execute printf('syn region indent%d start=/^\s\{%d}%s/           end=/^\(\s\{,%d}\S\)\@=/ contains=%s fold', i, indent, s:bullets, indent, allbut)
     execute printf('syn region indent%d start=/^\s\{%d}  \(%s\)\@<!/ end=/^\(\s\{,%d}\S\)\@=/ contains=%s fold', i, indent, s:bullets, indent, allbut)
-    execute printf('syn match indentBullet%d /^\s\{%d,}\zs%s/ containedin=indent%d contained', i, indent, s:bullets, i)
+    execute printf('syn match indentBullet%d /^\s\{%d,}\zs%s/ contains=@checkbox containedin=indent%d contained', i, indent, s:bullets, i)
     if !empty(colors)
       let cidx = i - 1 + shift
       let col  = colors[cidx % len(colors)]
