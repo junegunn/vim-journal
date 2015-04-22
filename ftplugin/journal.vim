@@ -22,8 +22,9 @@ function! s:progress(fw)
   while eval(cond)
     execute 'normal!' dir
     let c = col('.')
+    let e = empty(getline('.'))
     let i = s:indent()
-    if i >= 0 && (i != oi || i == oi && c <= oc)
+    if i >= 0 && !e && (i != oi || i == oi && c <= oc)
       break
     endif
   endwhile
