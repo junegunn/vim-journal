@@ -48,9 +48,9 @@ function! s:compare_h(c1, c2)
   return h1 == h2 ? 0 : h1 > h2 ? 1 : -1
 endfunction
 
-function! s:default_color_filter(hsl, normhsl)
-  return abs(a:hsl.l - a:normhsl.l) < 0.3 && a:hsl.s < 0.4
-endfunction
+let s:default_color_filter = [
+  \ function('journal#color#filter#readable'),
+  \ function('journal#color#filter#low_saturation')]
 
 function! s:extract_colors(max_count)
   let blacklist = s:blacklist()
@@ -63,32 +63,42 @@ function! s:extract_colors(max_count)
   redir => output
     silent hi
   redir END
-  let colors = {}
+  let all_colors = {}
   for line in filter(split(output, '\n'), 'v:val =~# "fg" && v:val !~# "bg"')
     let fg = s:extract_fg(line)
     if empty(fg)
       continue
     endif
-
-    let hsl = s:rgbhsl(fg)
-    let fns = copy(get(g:, 'journal#color_filters', [function('<sid>default_color_filter')]))
-    if !has_key(blacklist, fg) && min(map(fns, 'v:val(hsl, normhsl)')) == 1
-      let colors[fg] = 1
-    endif
+    let all_colors[fg] = 1
   endfor
-  let list = keys(colors)
+
+  let colors = keys(all_colors)
+  for Fn in copy(get(g:, 'journal#color_filters', s:default_color_filter))
+    let filtered = []
+    for fg in colors
+      let hsl = s:rgbhsl(fg)
+      if !has_key(blacklist, fg) && Fn(hsl, normhsl)
+        call add(filtered, fg)
+      endif
+    endfor
+    if len(filtered) < a:max_count
+      break
+    endif
+    let colors = filtered
+  endfor
+
   if len(colors) > a:max_count
     let trimmed = []
-    let ratio = 1.0 * len(list) / a:max_count
+    let ratio = 1.0 * len(colors) / a:max_count
     let idx = 0.0
     while len(trimmed) < a:max_count
-      call add(trimmed, list[float2nr(idx)])
+      call add(trimmed, colors[float2nr(idx)])
       let idx += ratio
     endwhile
-    let list = trimmed
+    let colors = trimmed
   endif
 
-  return sort(list, function('s:compare_h'))
+  return sort(colors, function('s:compare_h'))
 endfunction
 
 " http://stackoverflow.com/questions/27159322/rgb-values-of-the-colors-in-the-ansi-extended-colors-index-17-255
