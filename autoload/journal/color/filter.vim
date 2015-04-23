@@ -22,7 +22,7 @@
 " WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 function! journal#color#filter#readable(hsl, normhsl)
-  return abs(a:hsl.l - a:normhsl.l) <= 0.3
+  return abs(a:hsl.p - a:normhsl.p) <= 0.3
 endfunction
 
 function! journal#color#filter#low_saturation(hsl, normhsl)

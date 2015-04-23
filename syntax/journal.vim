@@ -81,7 +81,7 @@ function! s:extract_colors(max_count)
         call add(filtered, fg)
       endif
     endfor
-    if len(filtered) < a:max_count
+    if len(filtered) < a:max_count / 2
       break
     endif
     let colors = filtered
@@ -142,7 +142,7 @@ function! s:hsl(rgb)
   let l = h
 
   if max == min
-    return {'h': 0, 's': 0, 'l': h}
+    return {'h': 0, 's': 0, 'l': h, 'p': h}
   endif
 
   let d = max - min
@@ -153,7 +153,11 @@ function! s:hsl(rgb)
   elseif max == b | let h = (r - g) / d + 4
   endif
   let h = h / 6.0
-  return {'h': h, 's': s, 'l': l}
+
+  " http://stackoverflow.com/questions/596216/formula-to-determine-brightness-of-rgb-color
+  " http://alienryderflex.com/hsp.html
+  let p = sqrt(0.299 * r * r + 0.587 * g * g + 0.114 * b * b)
+  return {'h': h, 's': s, 'l': l, 'p': p}
 endfunction
 
 let s:rgbhsl = {}
