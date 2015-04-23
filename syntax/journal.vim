@@ -202,21 +202,20 @@ syn keyword month Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
 hi def link month Constant
 
 syn keyword logLevelIgnore DEBUG TRACE
-hi def link logLevelOk Comment
+hi def link logLevelIgnore Comment
 syn keyword logLevelInfo INFO
 hi def link logLevelInfo Conditional
 syn keyword logLevelWarn WARN
 hi def link logLevelWarn WarningMsg
 syn keyword logLevelError ERROR FATAL
 hi def link logLevelError Exception
+syn keyword keywords FIXME TODO XXX
+hi def link keywords TODO
 
 syn match date @\<[0-9]\{4}[-/][0-9]\{2}[-/][0-9]\{2}@
 hi def link date Directory
 syn match time @\<[0-9]\{2}:[0-9]\{2}:[0-9]\{2}\([,.][0-9]\+\)\?@
 hi def link time Number
-
-syn region blockComment start="\</\*" end="\*/"
-hi def link blockComment Comment
 
 syn region codeSpan oneline start="`" end="`"
 hi def link codeSpan String
@@ -224,22 +223,45 @@ hi def link codeSpan String
 syn region blockCode matchgroup=Snip start="```" end="```"
 hi def link blockCode String
 
-syn match file @\(^\|\s\zs\)[/~]\S\{-}\ze\(:\|\s\|$\)@
+syn match file @\(^\|\s\)\zs[/~]\S\{-}\ze\(:\|\s\|$\)@
 hi def link file PreProc
+
+syn region blockComment start="\(^\|\s\)\zs/\*" end="\*/"
+hi def link blockComment Comment
 
 syn region strong oneline matchgroup=strongSign start="\*\ze\S" end="\S\zs\*"
 hi def link strong Question
 hi def link strongSign Exception
 
+syn match strongEnd /\*\*$/
+syn match strongEnd1 /\*$/
+syn match strongEnd2 /\*$/ containedin=strongEnd contained
+hi def link strongEnd Exception
+hi def link strongEnd1 Exception
+hi def link strongEnd2 Question
+
 syn region strikeThrough oneline matchgroup=strikeThroughSign start="\~\ze\S" end="\S\zs\~"
 hi def link strikeThrough Ignore
 hi def link strikeThroughSign NonText
 
-syn match reference /\[[0-9]\{1,3}\]/
+syn match strikeThroughEnd /\~\~$/
+syn match strikeThroughEnd1 /\~$/
+syn match strikeThroughEnd2 /\~$/ containedin=strikeThroughEnd contained
+hi def link strikeThroughEnd NonText
+hi def link strikeThroughEnd1 NonText
+hi def link strikeThroughEnd2 Ignore
+
+syn match reference /\[[0-9]\{1,3}\]/ containedin=topLevel
 hi def link reference Keyword
 
-syn match separator /^[-=]\+$/
-hi def link separator Structure
+syn match topLevel /^\S.*:$/ contains=ALLBUT,topLevel
+hi def link topLevel Directory
+
+syn match topLevel /^\S\+.*\n[-=]\+$/ contains=topLevelUnderline
+syn match topLevelUnderline /^[-=]\+$/
+
+" syn match separator /^[-=]\+$/
+hi def link topLevelUnderline Structure
 
 function! s:syntax_include(lang, b, e, inclusive)
   let syns = split(globpath(&rtp, "syntax/".a:lang.".vim"), "\n")
