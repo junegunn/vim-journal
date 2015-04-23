@@ -22,7 +22,7 @@
 " WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 setlocal expandtab tabstop=2 shiftwidth=2
-setlocal textwidth=80
+setlocal textwidth=78
 setlocal autoindent
 setlocal formatoptions=tcroqnj1
 setlocal comments=bf:-,bf:*,bf:@,bf:$,bf:o,bf:x,bf:+,bf:=,bf:>,bf:#,bf:::
