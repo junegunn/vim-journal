@@ -223,7 +223,7 @@ hi def link codeSpan String
 syn region blockCode matchgroup=snippetDelimiter start="```" end="```"
 hi def link blockCode String
 
-syn region strong matchgroup=strongSign start="\*\ze\S" end="\S\zs\*"
+syn region strong oneline matchgroup=strongSign start="\*\ze\S" end="\S\zs\*"
 hi def link strong Question
 hi def link strongSign Exception
 
