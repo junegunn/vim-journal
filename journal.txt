@@ -3,7 +3,7 @@
 vim-journal
 ===========
 
-*vim-journal*[1] is a syntax plugin for plain-text notes that are written in
+*vim-journal*[1] is _a syntax plugin for plain-text notes_ that are written in
 a custom lightweight markup language. The syntax resembles `Markdown`, but
 it's more focused on bullet lists and it's specifically designed to look
 pretty on Vim.

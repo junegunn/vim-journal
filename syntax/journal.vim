@@ -220,18 +220,22 @@ hi def link time Number
 syn region codeSpan oneline start="`" end="`"
 hi def link codeSpan String
 
-syn region blockCode matchgroup=Snip start="```" end="```"
+syn region blockCode matchgroup=snippetDelimiter start="```" end="```"
 hi def link blockCode String
 
-syn match file @\(^\|\s\)\zs[/~]\S\{-}\ze\(:\|\s\|$\)@
+syn region strong matchgroup=strongSign start="\*\ze\S" end="\S\zs\*"
+hi def link strong Question
+hi def link strongSign Exception
+
+syn region underline matchgroup=underlineSign start="\(^\|\s\)\zs_\ze\S" end="\S\zs_\ze\(\s\|$\|\W\)"
+hi def link underline Underlined
+hi def link underlineSign NonText
+
+syn match file @\(^\|\s\)\zs[/~].\{-}\ze\(:\|\\\@<!\s\|$\)@
 hi def link file PreProc
 
 syn region blockComment start="\(^\|\s\)\zs/\*" end="\*/"
 hi def link blockComment Comment
-
-syn region strong oneline matchgroup=strongSign start="\*\ze\S" end="\S\zs\*"
-hi def link strong Question
-hi def link strongSign Exception
 
 syn match strongEnd /\*\*$/
 syn match strongEnd1 /\*$/
@@ -263,6 +267,9 @@ syn match topLevelUnderline /^[-=]\+$/
 " syn match separator /^[-=]\+$/
 hi def link topLevelUnderline Structure
 
+" Code snippets
+hi def link snippetDelimiter Folded
+
 function! s:syntax_include(lang, b, e, inclusive)
   let syns = split(globpath(&rtp, "syntax/".a:lang.".vim"), "\n")
   if empty(syns)
@@ -289,7 +296,7 @@ function! s:syntax_include(lang, b, e, inclusive)
                 \ 'end=%s\(%s\)\@<=\(\)%s contains=@%s containedin=ALL',
                 \ a:lang, z, a:b, z, z, a:e, z, a:lang)
   else
-    exec printf('syntax region %sSnip matchgroup=Snip start=%s%s%s ' .
+    exec printf('syntax region %sSnip matchgroup=snippetDelimiter start=%s%s%s ' .
                 \ 'end=%s%s%s contains=@%s containedin=ALL',
                 \ a:lang, z, a:b, z, z, a:e, z, a:lang)
   endif
@@ -319,10 +326,10 @@ function! s:init()
   endfor
 
   " TODO
-  for lang in ['ruby', 'yaml', 'vim', 'sh', 'python', 'java', 'c', 'sql', 'clojure']
+  for lang in get(g:, 'journal#langs',
+      \ ['ruby', 'yaml', 'vim', 'sh', 'python', 'java', 'go', 'c', 'sql', 'clojure'])
     call s:syntax_include(lang, '```'.lang, '```', 0)
   endfor
-  hi def link Snip Folded
 endfunction
 
 augroup journal
