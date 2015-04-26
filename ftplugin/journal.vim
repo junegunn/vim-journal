@@ -42,6 +42,7 @@ function! s:progress(fw)
   let oi = s:indent()
   let cond = a:fw ? "line('.') < line('$')" : "line('.') > 1"
   let dir = a:fw ? 'j^' : 'k^'
+  let i = 0
   while eval(cond)
     execute 'normal!' dir
     let c = col('.')
