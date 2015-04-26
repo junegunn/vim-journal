@@ -231,7 +231,7 @@ syn region underline matchgroup=underlineSign start="\(^\|\s\)\zs_\ze\S" end="\S
 hi def link underline Underlined
 hi def link underlineSign NonText
 
-syn match file @\(^\|\s\)\zs[/~].\{-}\ze\(:\|\\\@<!\s\|$\)@
+syn match file @\(^\|\s\)\zs\(file://\)\?[/~].\{-}\ze\(:\|\\\@<!\s\|$\)@
 hi def link file PreProc
 
 syn region blockComment start="\(^\|\s\)\zs/\*" end="\*/"
