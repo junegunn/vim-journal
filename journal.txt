@@ -14,7 +14,6 @@ Bullet lists [2]
 ----------------
 
 Example:
-
 - In typography, a bullet (•) is a typographical symbol or glyph used to
   introduce items in a list.
   = It is likely that the name originated from the resemblance of the
