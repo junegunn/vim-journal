@@ -26,6 +26,7 @@ setlocal textwidth=78
 setlocal autoindent
 setlocal formatoptions=tcroqnj1
 setlocal comments=bf:-,bf:*,bf:@,bf:$,bf:o,bf:x,bf:+,bf:=,bf:>,bf:#,bf:::
+setlocal synmaxcol=160
 
 function! s:indent()
   let hl = map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
