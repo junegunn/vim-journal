@@ -67,10 +67,10 @@ Software logs
 Code
 ----
 
-```clojure
+--clojure
 (defn is-directory? [path]
   (.isDirectory (io/file (path-for path))))
-```
+--
 
 Blocks can be indented.
 

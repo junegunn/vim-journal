@@ -292,7 +292,7 @@ function! s:syntax_include(lang, b, e, inclusive)
 
   silent! exec printf("syntax include @%s %s", a:lang, syns[0])
   if a:inclusive
-    exec printf('syntax region %sSnip start=%s\(\)\(%s\)\@=%s ' .
+    exec printf('syntax region %sSnip start=%s\(%s\)\@=%s ' .
                 \ 'end=%s\(%s\)\@<=\(\)%s contains=@%s containedin=ALL',
                 \ a:lang, z, a:b, z, z, a:e, z, a:lang)
   else
@@ -329,6 +329,7 @@ function! s:init()
   for lang in get(g:, 'journal#langs',
       \ ['ruby', 'yaml', 'vim', 'sh', 'python', 'java', 'go', 'c', 'sql', 'clojure'])
     call s:syntax_include(lang, '```'.lang, '```', 0)
+    call s:syntax_include(lang, '--\+'.lang.'-*', '--\+$', 0)
   endfor
 endfunction
 
