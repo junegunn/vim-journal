@@ -328,8 +328,8 @@ function! s:init()
   " TODO
   for lang in get(g:, 'journal#langs',
       \ ['ruby', 'yaml', 'vim', 'sh', 'python', 'java', 'go', 'c', 'sql', 'clojure'])
-    call s:syntax_include(lang, '```'.lang, '```', 0)
-    call s:syntax_include(lang, '--\+'.lang.'-*', '--\+$', 0)
+    call s:syntax_include(lang, '^\s*\zs```'.lang.'$', '^\s*\zs```$', 0)
+    call s:syntax_include(lang, '^\s*\zs--\+'.lang.'-*$', '^\s*\zs--\+$', 0)
   endfor
 endfunction
 
