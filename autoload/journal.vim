@@ -22,6 +22,6 @@
 " WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 function! journal#_bullets()
-  return '\([-@#$*:xo+>=!~]\|[0-9]\+[.:)]\|\[[ xvo*!+=-]\]\)\s'
+  return '\([-@#$*:xo+>=!~]\|[0-9]\+[.:)]\|<[-=]\|[-=]>\|\[[ xvo*!+=-]\]\)\s'
 endfunction
 
