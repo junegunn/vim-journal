@@ -217,7 +217,8 @@ hi def link time Number
 syn region codeSpan oneline start="`" end="`"
 hi def link codeSpan String
 
-syn region blockCode matchgroup=snippetDelimiter start="```" end="```"
+syn region blockCode matchgroup=snippetDelimiter start="^\s*\zs```\S*$" end="^\s*\zs```$"
+syn region blockCode matchgroup=snippetDelimiter start="^\s*\zs--\+[^[:blank:]-]*-*$" end="^\s*\zs--\+$"
 hi def link blockCode String
 
 syn region strong oneline matchgroup=strongSign start="\*\ze\S" end="\S\zs\*"
