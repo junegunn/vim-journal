@@ -221,9 +221,13 @@ syn region blockCode matchgroup=snippetDelimiter start="^\s*\zs```\S*$" end="^\s
 syn region blockCode matchgroup=snippetDelimiter start="^\s*\zs--\+[^[:blank:]-]*-*$" end="^\s*\zs--\+$"
 hi def link blockCode String
 
-syn region strong oneline matchgroup=strongSign start="\*\ze\S" end="\S\zs\*"
+syn region strong oneline matchgroup=strongSign start="\*\ze[^[:blank:]*]" end="[^[:blank:]*]\zs\*"
 hi def link strong Question
 hi def link strongSign Exception
+
+syn region intense oneline matchgroup=intenseSign start="\*\*\ze[^[:blank:]*]" end="[^[:blank:]*]\zs\*\*"
+hi def link intense Question
+hi def link intenseSign Exception
 
 syn region underline matchgroup=underlineSign start="\(^\|\s\)\zs_\ze\S" end="\S\zs_\ze\(\s\|$\|\W\)"
 hi def link underline Underlined
