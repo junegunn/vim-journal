@@ -260,10 +260,10 @@ hi def link strikeThroughEnd2 Ignore
 syn match reference /\[[0-9]\{1,3}\]/ containedin=topLevel
 hi def link reference Keyword
 
-syn match topLevel /\%1l\%1c[^[:punct:] ].*:$/ contains=ALLBUT,topLevel
-syn match topLevel /\(^\s*$\n^\)\@<=[^[:punct:] ].*:$/ contains=ALLBUT,topLevel
-syn match topLevel /\%1l\%1c[^[:punct:] ].*[^.?!,]\ze\n^\(\s\+\|\s*$\)/ contains=ALLBUT,topLevel
-syn match topLevel /\(^\s*$\n^\)\@<=[^[:punct:] ].*[^.?!,]\ze\n^\(\s\+\|\s*$\)/ contains=ALLBUT,topLevel
+syn match topLevel /\%1l\%1c[^[:punct:] ].*$/ contains=ALLBUT,topLevel
+syn match topLevel /\(^\s*$\n^\)\@<=[^[:punct:] ].*/ contains=ALLBUT,topLevel
+" syn match topLevel /\(^\s*$\n^\)\@<=[^[:punct:] ].*:$/ contains=ALLBUT,topLevel
+" syn match topLevel /\(^\s*$\n^\)\@<=[^[:punct:] ].*[^.?!,]\ze\n^\(\s\+\|\s*$\)/ contains=ALLBUT,topLevel
 hi def link topLevel Directory
 
 syn match topLevel /^\S\+.*\n[-=]\+$/ contains=topLevelUnderline
