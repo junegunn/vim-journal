@@ -311,6 +311,19 @@ function! s:syntax_include(lang, b, e, inclusive)
   endif
 endfunction
 
+function! s:syntax_detect(l1, l2)
+  let lines = filter(getline(a:l1, a:l2), 'v:val =~ ''\s*[-`]''')
+  for line in lines
+    let lang = matchstr(line, '^\s*```\zs\S\+\ze$')
+    let lang = empty(lang) ? matchstr(line, '^\s*--\+\zs\S\+\ze-*$') : lang
+
+    if !empty(lang)
+      call s:syntax_include(lang, '^\s*\zs```'.lang.'$', '^\s*\zs```$', 0)
+      call s:syntax_include(lang, '^\s*\zs--\+'.lang.'-*$', '^\s*\zs--\+$', 0)
+    endif
+  endfor
+endfunction
+
 function! s:init()
   let max_indent = get(g:, 'journal#max_indent', 10)
   let colors = s:extract_colors(max_indent)
@@ -330,12 +343,15 @@ function! s:init()
     endif
   endfor
 
-  " TODO
-  for lang in get(g:, 'journal#langs',
-      \ ['ruby', 'yaml', 'vim', 'sh', 'python', 'java', 'go', 'c', 'sql', 'clojure'])
-    call s:syntax_include(lang, '^\s*\zs```'.lang.'$', '^\s*\zs```$', 0)
-    call s:syntax_include(lang, '^\s*\zs--\+'.lang.'-*$', '^\s*\zs--\+$', 0)
-  endfor
+  call s:syntax_detect(1, '$')
+  augroup journal_syntax_detect
+    autocmd!
+    if exists('##TextChangedI')
+      autocmd TextChangedI <buffer> call <sid>syntax_detect('.', '.')
+    else
+      autocmd CursorMovedI <buffer> call <sid>syntax_detect('.', '.')
+    endif
+  augroup END
 endfunction
 
 augroup journal
