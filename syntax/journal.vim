@@ -39,7 +39,7 @@ function! s:blacklist()
 endfunction
 
 function! s:extract_fg(line)
-  return matchstr(a:line, (has('gui') ? 'gui' : 'cterm').'fg=\zs\S*\ze')
+  return matchstr(a:line, (has('gui_running') ? 'gui' : 'cterm').'fg=\zs\S*\ze')
 endfunction
 
 function! s:compare_h(c1, c2)
@@ -325,8 +325,8 @@ function! s:init()
       let cidx = i - 1 + shift
       let col  = colors[cidx % len(colors)]
       let bcol = colors[(cidx + max_indent / 2) % len(colors)]
-      execute printf('hi indent%d %sfg=%s',       i, has('gui') ? 'gui' : 'cterm', col)
-      execute printf('hi indentBullet%d %sfg=%s', i, has('gui') ? 'gui' : 'cterm', bcol)
+      execute printf('hi indent%d %sfg=%s',       i, has('gui_running') ? 'gui' : 'cterm', col)
+      execute printf('hi indentBullet%d %sfg=%s', i, has('gui_running') ? 'gui' : 'cterm', bcol)
     endif
   endfor
 
