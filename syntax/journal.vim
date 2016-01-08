@@ -221,15 +221,15 @@ syn region blockCode matchgroup=snippetDelimiter start="^\s*\zs```\S*$" end="^\s
 syn region blockCode matchgroup=snippetDelimiter start="^\s*\zs--\+[^[:blank:]-]*-*$" end="^\s*\zs--\+$"
 hi def link blockCode String
 
-syn region strong oneline matchgroup=strongSign start="\*\ze[^[:blank:]]" end="[^[:blank:]]\zs\*"
+syn region strong oneline matchgroup=strongSign start="\*\ze[^[:blank:]]" end="[^[:blank:]]\zs\*" contains=@Spell
 hi def link strong Question
 hi def link strongSign Exception
 
-syn region intense oneline matchgroup=intenseSign start="\*\*\ze[^[:blank:]*]" end="[^[:blank:]*]\zs\*\*"
+syn region intense oneline matchgroup=intenseSign start="\*\*\ze[^[:blank:]*]" end="[^[:blank:]*]\zs\*\*" contains=@Spell
 hi def link intense Question
 hi def link intenseSign Exception
 
-syn region underline matchgroup=underlineSign start="\(^\|\s\)\zs_\ze\S" end="\S\zs_\ze\(\s\|$\|\W\)"
+syn region underline matchgroup=underlineSign start="\(^\|\s\)\zs_\ze\S" end="\S\zs_\ze\(\s\|$\|\W\)" contains=@Spell
 hi def link underline Underlined
 hi def link underlineSign NonText
 
@@ -260,13 +260,13 @@ hi def link strikeThroughEnd2 Ignore
 syn match reference /\[[0-9]\{1,3}\]/ containedin=topLevel
 hi def link reference Keyword
 
-syn match topLevel /\%1l\%1c[^[:punct:] ].*$/ contains=ALLBUT,topLevel
-syn match topLevel /\(^\s*$\n^\)\@<=[^[:punct:] ].*/ contains=ALLBUT,topLevel
+syn match topLevel /\%1l\%1c[^[:punct:] ].*$/ contains=ALLBUT,@NoSpell,topLevel
+syn match topLevel /\(^\s*$\n^\)\@<=[^[:punct:] ].*/ contains=ALLBUT,@NoSpell,topLevel
 " syn match topLevel /\(^\s*$\n^\)\@<=[^[:punct:] ].*:$/ contains=ALLBUT,topLevel
 " syn match topLevel /\(^\s*$\n^\)\@<=[^[:punct:] ].*[^.?!,]\ze\n^\(\s\+\|\s*$\)/ contains=ALLBUT,topLevel
 hi def link topLevel Directory
 
-syn match topLevel /^\S\+.*\n[-=]\+$/ contains=topLevelUnderline
+syn match topLevel /^\S\+.*\n[-=]\+$/ contains=@Spell,topLevelUnderline
 syn match topLevelUnderline /^[-=]\+$/
 
 " syn match separator /^[-=]\+$/
@@ -317,7 +317,7 @@ function! s:init()
   let shift = get(g:, 'journal#color_shift', max_indent / 2)
   for i in range(1, max_indent)
     let indent = i * &tabstop
-    let allbut = 'ALLBUT,topLevel,'.join(map(range(1, i), '"indent".v:val'), ',')
+    let allbut = 'ALLBUT,@NoSpell,topLevel,'.join(map(range(1, i), '"indent".v:val'), ',')
     execute printf('syn region indent%d start=/^\s\{%d}%s/           end=/^\(\s\{,%d}\S\)\@=/ contains=%s fold', i, indent, s:bullets, indent, allbut)
     execute printf('syn region indent%d start=/^\s\{%d}  \(%s\)\@<!/ end=/^\(\s\{,%d}\S\)\@=/ contains=%s fold', i, indent, s:bullets, indent, allbut)
     execute printf('syn match indentBullet%d /^\s\{%d,}\zs%s/ contains=@checkbox containedin=indent%d contained', i, indent, s:bullets, i)
@@ -336,6 +336,8 @@ function! s:init()
     call s:syntax_include(lang, '^\s*\zs```'.lang.'$', '^\s*\zs```$', 0)
     call s:syntax_include(lang, '^\s*\zs--\+'.lang.'-*$', '^\s*\zs--\+$', 0)
   endfor
+
+  syn spell toplevel
 endfunction
 
 augroup journal
