@@ -261,9 +261,7 @@ syn match reference /\[[0-9]\{1,3}\]/ containedin=topLevel
 hi def link reference Keyword
 
 syn match topLevel /\%1l\%1c[^[:punct:] ].*$/ contains=ALLBUT,@NoSpell,topLevel
-syn match topLevel /\(^\s*$\n^\)\@<=[^[:punct:] ].*/ contains=ALLBUT,@NoSpell,topLevel
-" syn match topLevel /\(^\s*$\n^\)\@<=[^[:punct:] ].*:$/ contains=ALLBUT,topLevel
-" syn match topLevel /\(^\s*$\n^\)\@<=[^[:punct:] ].*[^.?!,]\ze\n^\(\s\+\|\s*$\)/ contains=ALLBUT,topLevel
+syn region topLevel start=/\%(^\s*$\n^\)\@<=[^[:punct:] ]/ end=/[^.,]\ze\n\%(\s*$\|[[:punct:] ]\)/ oneline contains=ALLBUT,@NoSpell,topLevel
 hi def link topLevel Directory
 
 syn match topLevel /^\S\+.*\n[-=]\+$/ contains=@Spell,topLevelUnderline
