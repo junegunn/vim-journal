@@ -24,7 +24,8 @@
 setlocal expandtab tabstop=2 shiftwidth=2
 setlocal textwidth=78
 setlocal autoindent
-setlocal formatoptions=tcroqnj1
+setlocal formatoptions=tcroqn1
+silent! setlocal formatoptions+=j
 setlocal comments=bf:-,bf:*,bf:@,bf:$,bf:o,bf:x,bf:+,bf:=,bf:>,bf:#,bf:::
 " setlocal synmaxcol=160
 
