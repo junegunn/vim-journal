@@ -28,8 +28,12 @@ silent! setlocal formatoptions+=j
 setlocal comments=bf:-,bf:*,bf:@,bf:$,bf:o,bf:x,bf:+,bf:=,bf:>,bf:#,bf:::
 " setlocal synmaxcol=160
 
+function! s:hl()
+  return map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
+endfunction
+
 function! s:indent()
-  let hl = map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
+  let hl = s:hl()
   if empty(hl)
     return -1
   endif
@@ -37,31 +41,30 @@ function! s:indent()
                    \ "str2nr(substitute(v:val, '[^0-9]', '', 'g'))"), 0))
 endfunction
 
-function! s:progress(fw)
-  normal! ^
-  let oc = col('.')
-  let oi = s:indent()
-  let cond = a:fw ? "line('.') < line('$')" : "line('.') > 1"
-  let dir = a:fw ? 'j^' : 'k^'
-  let i = 0
-  while eval(cond)
-    execute 'normal!' dir
-    let c = col('.')
-    let e = empty(getline('.'))
-    let i = s:indent()
-    if i >= 0 && !e && (i != oi || i == oi && c <= oc)
-      break
-    endif
+function! s:progress(fw, cnt)
+  let cnt = a:cnt
+  while cnt
+    let opos = getpos('.')
+    while 1
+      let pos = getpos('.')
+      call search('^\k', a:fw ? '' : 'b')
+      if get(s:hl(), 0, '') == 'topLevel'
+        let cnt -= 1
+        break
+      endif
+      if getpos('.') == pos
+        call setpos('.', opos)
+        return
+      endif
+    endwhile
   endwhile
-  if i >= 0 && getline('.')[col('.') - 1:] =~ '^'.journal#_bullets()
-    normal! w
-  endif
 endfunction
 
-nnoremap <buffer><silent> [[ :call <sid>progress(0)<CR>
-nnoremap <buffer><silent> ]] :call <sid>progress(1)<CR>
-xnoremap <buffer><silent> [[ <ESC>:execute 'normal! gv'<BAR>call <sid>progress(0)<CR>
-xnoremap <buffer><silent> ]] <ESC>:execute 'normal! gv'<BAR>call <sid>progress(1)<CR>
+" <C-U> is required to correctly handle counts
+nnoremap <buffer> <silent> [[ :<c-u>call <sid>progress(0, v:count1)<CR>
+nnoremap <buffer> <silent> ]] :<c-u>call <sid>progress(1, v:count1)<CR>
+xnoremap <buffer> <silent> [[ :<c-u>call <sid>progress(0, v:count1)<CR>``gv``
+xnoremap <buffer> <silent> ]] :<c-u>call <sid>progress(1, v:count1)<CR>``gv``
 
 nnoremap <buffer> ][ <nop>
 nnoremap <buffer> [] <nop>
