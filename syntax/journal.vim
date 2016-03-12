@@ -198,15 +198,15 @@ syn keyword month JAN FEB MAR APR MAY JUN JUL AUG SEP OCT NOV DEC
 syn keyword month Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
 hi def link month Constant
 
-syn keyword logLevelIgnore DEBUG TRACE
+syn region logLevelIgnore start="\<\%(DEBUG\|TRACE\)" end="\>"
 hi def link logLevelIgnore Comment
-syn keyword logLevelInfo INFO
+syn region logLevelInfo start="\<INFO" end="\>"
 hi def link logLevelInfo Conditional
-syn keyword logLevelWarn WARN
+syn region logLevelWarn start="\<WARN" end="\>"
 hi def link logLevelWarn WarningMsg
-syn keyword logLevelError ERROR FATAL
+syn region logLevelError start="\<\%(ERROR\|FATAL\)" end="\>"
 hi def link logLevelError Exception
-syn keyword keywords FIXME TODO XXX
+syn region keywords start="\<\%(FIXME\|TODO\|XXX\)" end="\>"
 hi def link keywords TODO
 
 syn match date @\<[0-9]\{4}[-/][0-9]\{2}[-/][0-9]\{2}@
