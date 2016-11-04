@@ -273,7 +273,18 @@ hi def link topLevelUnderline Structure
 " Code snippets
 hi def link snippetDelimiter Folded
 
-function! s:syntax_include(lang, b, e, inclusive)
+function! s:detect(l1, l2)
+  let b:journal_types = get(b:, 'journal_types', {})
+  let types = filter(map(getline(a:l1, a:l2), 'matchstr(v:val, ''^\s*\%(```\|--\+\)\zs\S*$'')'), '!empty(v:val) && !has_key(b:journal_types, v:val)')
+
+  for lang in types
+    call s:load(lang)
+  endfor
+  return types
+endfunction
+
+function! s:load(lang)
+  let b:journal_types[a:lang] = 1
   let syns = split(globpath(&rtp, "syntax/".a:lang.".vim"), "\n")
   if empty(syns)
     return
@@ -284,25 +295,23 @@ function! s:syntax_include(lang, b, e, inclusive)
     unlet b:current_syntax
   endif
 
-  let z = "'" " Default
-  for nr in range(char2nr('a'), char2nr('z'))
-    let char = nr2char(nr)
-    if a:b !~ char && a:e !~ char
-      let z = char
-      break
-    endif
-  endfor
+  silent! execute printf("syntax include @%s %s", a:lang, syns[0])
 
-  silent! exec printf("syntax include @%s %s", a:lang, syns[0])
-  if a:inclusive
-    exec printf('syntax region %sSnip start=%s\(%s\)\@=%s ' .
-                \ 'end=%s\(%s\)\@<=\(\)%s contains=@%s containedin=ALL',
-                \ a:lang, z, a:b, z, z, a:e, z, a:lang)
-  else
+  for [b, e] in [['^\s*\zs```'.a:lang.'$', '^\s*\zs```$'], ['^\s*\zs--\+'.a:lang.'-*$', '^\s*\zs--\+$']]
+
+    let z = "'" " Default
+    for nr in range(char2nr('a'), char2nr('z'))
+      let char = nr2char(nr)
+      if b !~ char && e !~ char
+        let z = char
+        break
+      endif
+    endfor
+
     exec printf('syntax region %sSnip matchgroup=snippetDelimiter start=%s%s%s ' .
-                \ 'end=%s%s%s contains=@%s containedin=ALL',
-                \ a:lang, z, a:b, z, z, a:e, z, a:lang)
-  endif
+          \ 'end=%s%s%s contains=@%s containedin=ALL',
+          \ a:lang, z, b, z, z, e, z, a:lang)
+  endfor
 
   if exists('csyn')
     let b:current_syntax = csyn
@@ -328,21 +337,21 @@ function! s:init()
     endif
   endfor
 
-  " TODO
-  for lang in get(g:, 'journal#langs',
-      \ ['ruby', 'yaml', 'vim', 'sh', 'python', 'java', 'go', 'c', 'sql', 'clojure'])
-    call s:syntax_include(lang, '^\s*\zs```'.lang.'$', '^\s*\zs```$', 0)
-    call s:syntax_include(lang, '^\s*\zs--\+'.lang.'-*$', '^\s*\zs--\+$', 0)
-  endfor
-
   syn spell toplevel
 endfunction
 
 augroup journal
   autocmd!
   autocmd ColorScheme * call s:init()
+  if exists('##TextChangedI')
+    autocmd TextChangedI <buffer> call s:detect('.', '.')
+  else
+    autocmd CursorMovedI <buffer> call s:detect('.', '.')
+  endif
 augroup END
+
 call s:init()
+call s:detect(1, '$')
 
 let b:current_syntax = 'journal'
 
