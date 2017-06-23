@@ -271,6 +271,12 @@ hi def link topLevel Directory
 syn match topLevel /^\S\+.*\n[-=]\+$/ contains=@Spell,topLevelUnderline
 syn match topLevelUnderline /^[-=]\+$/
 
+syn match headingMarker /^##\+/ containedin=heading
+hi def link headingMarker Keyword
+
+syn match heading /^##\+ \S.*/ contains=headingMarker
+hi def link heading Title
+
 " syn match separator /^[-=]\+$/
 hi def link topLevelUnderline Structure
 
